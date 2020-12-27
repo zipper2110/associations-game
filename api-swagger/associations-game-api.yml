@@ -1,0 +1,181 @@
+openapi: 3.0.0
+
+info:
+  title: Associations Game API
+  description: The API description for the Associations Game.
+  version: 0.0.1
+
+servers:
+  - url: https://api.pangur.ru/v1
+    description: Test API server
+
+tags:
+- name: "user"
+  description: "Operations about user"
+
+paths:
+  #####################  Register  ####################### 
+  '/user/register':
+    post:
+      tags:
+      - "user"
+      summary: Registers a new user
+      operationId: registerUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: User already exists
+          content: {}
+
+  #####################  Login  #######################
+  '/user/login':
+    post:
+      tags:
+      - "user"
+      summary: Logs a user in
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtToken'
+        '401':
+          description: Credentials are wrong
+          content: {}
+
+  #####################  Refresh JWT token #######################
+  '/user/refresh-token':
+    get:
+      tags:
+      - "user"
+      summary: Refreshes JWT token
+      operationId: refreshJwtToken
+      responses:
+        '200':
+          description: New JWT token successfuly obtained
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtToken'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}                
+      security:
+        - jwtAuth: []
+
+  #####################  Logout #######################
+  '/user/logout':
+    get:
+      tags:
+      - "user"
+      summary: Logouts a user
+      operationId: logout
+      responses:
+        '200':
+          description: User successfuly logged out
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+  #####################  Get User #######################
+  '/user/{userId}':
+    get:
+      tags:
+      - "user"
+      summary: Gets user info
+      operationId: getOneUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User successfuly obtained
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtToken'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+      xml:
+        name: User
+
+    JwtToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: integer
+          format: int64
+      xml:
+        name: User
+
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
