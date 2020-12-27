@@ -49,6 +49,7 @@ paths:
       tags:
       - "user"
       summary: Logs a user in
+      description: You can use "test" login and "test" password to test login.
       operationId: loginUser
       requestBody:
         required: true
@@ -117,6 +118,7 @@ paths:
       tags:
       - "user"
       summary: Gets user info
+      description: There's user with ID 1 available in the test API.
       operationId: getOneUser
       parameters:
         - name: userId
