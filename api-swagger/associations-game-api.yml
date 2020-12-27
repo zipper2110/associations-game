@@ -2,12 +2,14 @@ openapi: 3.0.0
 
 info:
   title: Associations Game API
-  description: The API description for the Associations Game.
+  description: The API description for the Associations Game. For testing auth you can use the following token "secret".
   version: 0.0.1
 
 servers:
   - url: https://api.pangur.ru/v1
-    description: Test API server
+    description: Web test API server
+  - url: http://a-game-api
+    description: Local test API server
 
 tags:
 - name: "user"
@@ -21,19 +23,15 @@ paths:
       - "user"
       summary: Registers a new user
       operationId: registerUser
-      parameters:
-        - name: username
-          in: query
-          description: The user name for login
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: true
-          schema:
-            type: string      
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserForm'
+            example:
+              username: NewUserName
+              password: fancyPassword
       responses:
         '200':
           description: Successful operation
@@ -52,19 +50,15 @@ paths:
       - "user"
       summary: Logs a user in
       operationId: loginUser
-      parameters:
-        - name: username
-          in: query
-          description: The user name for login
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: true
-          schema:
-            type: string      
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserForm'
+            example:
+              username: test
+              password: test
       responses:
         '200':
           description: Successful operation
@@ -75,6 +69,22 @@ paths:
         '401':
           description: Credentials are wrong
           content: {}
+  
+  #####################  Logout #######################
+  '/user/logout':
+    post:
+      tags:
+      - "user"
+      summary: Logs a user out
+      operationId: logout
+      responses:
+        '200':
+          description: User successfuly logged out
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []          
 
   #####################  Refresh JWT token #######################
   '/user/refresh-token':
@@ -98,22 +108,6 @@ paths:
         '404':
           description: User not found
           content: {}                
-      security:
-        - jwtAuth: []
-
-  #####################  Logout #######################
-  '/user/logout':
-    get:
-      tags:
-      - "user"
-      summary: Logouts a user
-      operationId: logout
-      responses:
-        '200':
-          description: User successfuly logged out
-          content: {}
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
       security:
         - jwtAuth: []
 
@@ -156,6 +150,16 @@ components:
           type: string
       xml:
         name: User
+
+    UserForm:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      xml:
+        name: UserForm
 
     JwtToken:
       type: object
