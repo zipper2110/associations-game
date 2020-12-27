@@ -103,12 +103,6 @@ paths:
                 $ref: '#/components/schemas/JwtToken'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '400':
-          description: Invalid ID supplied
-          content: {}
-        '404':
-          description: User not found
-          content: {}                
       security:
         - jwtAuth: []
 
@@ -137,6 +131,12 @@ paths:
                 $ref: '#/components/schemas/JwtToken'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
       security:
         - jwtAuth: []
 
