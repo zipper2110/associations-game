@@ -187,6 +187,7 @@ paths:
       tags:
       - "game"
       summary: Add a new player to a game
+      description: Test game with ID 1 is available in the test API.
       operationId: addPlayer
       parameters:
         - name: gameId
@@ -230,6 +231,7 @@ paths:
       tags:
       - "game"
       summary: Remove a player from a game
+      description: Test game with ID 1 is available in the test API.
       operationId: removePlayer
       parameters:
         - name: gameId
@@ -273,6 +275,7 @@ paths:
       tags:
       - "game"
       summary: Get a game state
+      description: Test game with ID 1 is available in the test API.
       operationId: getGame
       parameters:
         - name: gameId
