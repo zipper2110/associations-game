@@ -267,19 +267,58 @@ paths:
       security:
         - jwtAuth: []
 
+  ###################  Get a game state  ######################
+  '/game/{gameId}':
+    get:
+      tags:
+      - "game"
+      summary: Get a game state
+      operationId: getGame
+      parameters:
+        - name: gameId
+          in: path
+          description: ID of the game to get
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: Game state has been successfully obtained
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '400':
+          description: Some error happened while removing a player
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Game not found
+          content: {}
+      security:
+        - jwtAuth: []
+
 
 components:
+  
+  ###################  Examples  ######################
   examples:
+
     ExistingUser:
       summary: Existing user
       value:
         username: test
         password: test
+
     NotExistingUser:
       summary: Not existing user
       value:
         username: test222
         password: test222
+
     NewGameForm:
       summary: Not existing user
       value:
@@ -288,6 +327,7 @@ components:
         decks_number: 1
         leader_id: 1
 
+  ###################  Schemas  ######################
   schemas:
     User:
       type: object
@@ -383,12 +423,14 @@ components:
       xml:
         name: GameForm
 
+  ###################  Security  ######################
   securitySchemes:
     jwtAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
 
+  ###################  Responses  ######################
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
