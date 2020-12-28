@@ -5,11 +5,12 @@ class Api
     public $headers;
     public $optionsHeaders;
     public $apiPrefix;
-    public $method;
-    public $route;
     public $token;
     public $data;
-    public $routes;
+
+    private $method;
+    private $route;
+    private $routes;
 
     /**
      * Api constructor.
@@ -26,7 +27,7 @@ class Api
         ];
         $this->apiPrefix = '/v1/';
         $this->method = $_SERVER['REQUEST_METHOD'];
-        $this->route = str_replace($this->apiPrefix, '/', $_SERVER['REQUEST_URI']);
+        $this->route = $_SERVER['REQUEST_URI'];
         $this->token = $this->getBearerToken();
         $this->data = $this->getData();
         $this->routes = [];
@@ -40,45 +41,6 @@ class Api
         $this->setHeaders();
         $this->processRoutes();
         $this->respond(404);
-    }
-
-    /**
-     * Set the provided headers
-     */
-    public function setHeaders()
-    {
-        foreach ($this->headers as $k => $v) {
-            header("{$k}: {$v}");
-        }
-        if ($this->method === 'OPTIONS') {
-            foreach ($this->optionsHeaders as $k => $v) {
-                header("{$k}: {$v}");
-            }
-            header("HTTP/1.1 200 OK");
-            die;
-        }
-    }
-
-    /**
-     * Process routes
-     */
-    public function processRoutes()
-    {
-        foreach ($this->routes as $route)
-        {
-            if ($this->method === $route['method'])
-            {
-                # Proecss simple routes
-                if (!$route['regexp'] && $this->route === $route['route']) {
-                    $route['callback']();
-                }
-
-                # Proecss regexp routes
-                if ($route['regexp'] && preg_match($route['route'], $this->route, $matches)) {
-                    $route['callback']( $matches );
-                }
-            }
-        }
     }
 
     /**
@@ -116,16 +78,6 @@ class Api
     }
 
     /**
-     * Check if this is a not empty array
-     *
-     * @param $array
-     * @return bool
-     */
-    public static function ca($array) {
-        return is_array($array) && count($array) > 0;
-    }
-
-    /**
      * Basic responses
      *
      * @param int $code
@@ -156,6 +108,49 @@ class Api
         }
         header("HTTP/1.1 {$code} {$message}");
         die;
+    }
+
+    /**
+     * Set the provided headers
+     */
+    private function setHeaders()
+    {
+        foreach ($this->headers as $k => $v) {
+            header("{$k}: {$v}");
+        }
+        if ($this->method === 'OPTIONS') {
+            foreach ($this->optionsHeaders as $k => $v) {
+                header("{$k}: {$v}");
+            }
+            header("HTTP/1.1 200 OK");
+            die;
+        }
+    }
+
+    /**
+     * Process routes
+     */
+    private function processRoutes()
+    {
+        # remove API prefix from the route
+        $this->route = str_replace($this->apiPrefix, '/', $this->route);
+
+        # check routes one by one
+        foreach ($this->routes as $route)
+        {
+            if ($this->method === $route['method'])
+            {
+                # Proecss simple routes
+                if (!$route['regexp'] && $this->route === $route['route']) {
+                    $route['callback']();
+                }
+
+                # Proecss regexp routes
+                if ($route['regexp'] && preg_match($route['route'], $this->route, $matches)) {
+                    $route['callback']( $matches );
+                }
+            }
+        }
     }
 
     /**
@@ -200,5 +195,15 @@ class Api
             return $matches[1];
         }
         return null;
+    }
+
+    /**
+     * Check if this is a not empty array
+     *
+     * @param $array
+     * @return bool
+     */
+    private static function ca($array) {
+        return is_array($array) && count($array) > 0;
     }
 }
