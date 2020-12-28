@@ -90,7 +90,7 @@ $api->post('/game/create', function() use ($api, $game) {
 });
 
 # Add a player to a game
-$api->post('|^/game/(\d+)/add-player$|', function($params) use ($api) {
+$api->post('|^/game/(\d+)/player$|', function($params) use ($api) {
     $api->checkAccess();
     if ((int) $params[1] !== 1) {
         $api->respond(404);
@@ -100,7 +100,7 @@ $api->post('|^/game/(\d+)/add-player$|', function($params) use ($api) {
 }, Api::TYPE_REGEXP);
 
 # Remove a player from a game
-$api->post('|^/game/(\d+)/remove-player$|', function($params) use ($api) {
+$api->delete('|^/game/(\d+)/player$|', function($params) use ($api) {
     $api->checkAccess();
     if ((int) $params[1] !== 1) {
         $api->respond(404);
@@ -109,7 +109,7 @@ $api->post('|^/game/(\d+)/remove-player$|', function($params) use ($api) {
 
 }, Api::TYPE_REGEXP);
 
-# Remove a player from a game
+# Get the game state
 $api->get('|^/game/(\d+)$|', function($params) use ($api, $game) {
     $api->checkAccess();
     if ((int) $params[1] !== 1) {

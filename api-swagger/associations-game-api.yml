@@ -181,8 +181,43 @@ paths:
       security:
         - jwtAuth: []
 
+  ###################  Get a game state  ######################
+  '/game/{gameId}':
+    get:
+      tags:
+      - "game"
+      summary: Get a game state
+      description: Test game with ID 1 is available in the test API.
+      operationId: getGame
+      parameters:
+        - name: gameId
+          in: path
+          description: ID of the game to get
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: Game state has been successfully obtained
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '400':
+          description: Some error happened while removing a player
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Game not found
+          content: {}
+      security:
+        - jwtAuth: []        
+
   ###################  Add a new player  ######################
-  '/game/{gameId}/add-player':
+  '/game/{gameId}/player':
     post:
       tags:
       - "game"
@@ -226,8 +261,7 @@ paths:
         - jwtAuth: []
 
   ###################  Remove player  ######################
-  '/game/{gameId}/remove-player':
-    post:
+    delete:
       tags:
       - "game"
       summary: Remove a player from a game
@@ -268,42 +302,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
       security:
         - jwtAuth: []
-
-  ###################  Get a game state  ######################
-  '/game/{gameId}':
-    get:
-      tags:
-      - "game"
-      summary: Get a game state
-      description: Test game with ID 1 is available in the test API.
-      operationId: getGame
-      parameters:
-        - name: gameId
-          in: path
-          description: ID of the game to get
-          required: true
-          schema:
-            type: integer
-            format: int64
-
-      responses:
-        '200':
-          description: Game state has been successfully obtained
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Game'
-        '400':
-          description: Some error happened while removing a player
-          content: {}
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
-        '404':
-          description: Game not found
-          content: {}
-      security:
-        - jwtAuth: []
-
 
 components:
   
