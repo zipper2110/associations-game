@@ -293,7 +293,7 @@ paths:
                   player_id: 2
       responses:
         '200':
-          description: Player has been successfully removes
+          description: Player has been successfully removed
           content: {}
         '400':
           description: Some error happened while removing a player
