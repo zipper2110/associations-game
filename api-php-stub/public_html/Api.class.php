@@ -9,6 +9,7 @@ class Api
     public $optionsHeaders;
     public $apiPrefix;
     public $token;
+    public $secret_token;
     public $data;
 
     private $method;
@@ -111,6 +112,16 @@ class Api
         }
         header("HTTP/1.1 {$code} {$message}");
         die;
+    }
+
+    /**
+     * Return 401 if tokens mismatch
+     */
+    public function checkAccess()
+    {
+        if ($this->token !== $this->secret_token) {
+            $this->respond(401);
+        }
     }
 
     /**

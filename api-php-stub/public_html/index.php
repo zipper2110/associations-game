@@ -1,15 +1,22 @@
 <?php
 
-# Import and init API
-require_once('Api.class.php');
-$api = new Api();
-
-
 # Secret credentials
 $user = [
     'id' => 1,
     'username' => 'test',
     'password' => 'test',
+];
+$userWthoutPassword = $user;
+unset($userWthoutPassword['password']);
+
+$game = [
+    'title' => 'First game',
+    'users_number' => 1,
+    'decks_number' => 3,
+    'leader_id' => 1,
+    'users' => [
+        $userWthoutPassword
+    ],
 ];
 
 $jwt_token = [
@@ -19,6 +26,12 @@ $jwt_token = [
 ];
 
 
+# Import and init API
+require_once('Api.class.php');
+$api = new Api();
+$api->secret_token = $jwt_token['access_token'];
+
+
 # Main Page
 $api->get('/', function() use ($api) {
     $api->respond(200, [
@@ -26,6 +39,8 @@ $api->get('/', function() use ($api) {
         'message' => 'AG API v0.0.1',
     ]);
 });
+
+######################  PLAYER  ######################
 
 # Register a New User
 $api->post('/user/register', function() use ($api, $jwt_token) {
@@ -44,33 +59,66 @@ $api->post('/user/login', function() use ($api, $user, $jwt_token) {
 });
 
 # Logout
-$api->post('/user/logout', function() use ($api, $jwt_token) {
-    if ($api->token !== $jwt_token['access_token']) {
-        $api->respond(401);
-    }
+$api->post('/user/logout', function() use ($api) {
+    $api->checkAccess();
     $api->respond(200);
 });
 
 # Refresh JWT token
 $api->get('/user/refresh-token', function() use ($api, $jwt_token) {
-    if ($api->token !== $jwt_token['access_token']) {
-        $api->respond(401);
-    }
+    $api->checkAccess();
     $api->respond(200, $jwt_token);
 });
 
 # Get User
-$api->get('|^/user/(\d+)$|', function($params) use ($api, $user, $jwt_token) {
-    if ($api->token !== $jwt_token['access_token']) {
-        $api->respond(401);
-    }
+$api->get('|^/user/(\d+)$|', function($params) use ($api, $userWthoutPassword) {
+    $api->checkAccess();
     if ((int) $params[1] !== 1) {
         $api->respond(404);
     }
-    unset($user['password']);
-    $api->respond(200, $user);
+    $api->respond(200, $userWthoutPassword);
 
 }, Api::TYPE_REGEXP);
+
+
+######################  GAME  ######################
+
+# Create a new game
+$api->post('/game/create', function() use ($api, $game) {
+    $api->checkAccess();
+    $api->respond(200, $game);
+});
+
+# Add a player to a game
+$api->post('|^/game/(\d+)/add-player$|', function($params) use ($api) {
+    $api->checkAccess();
+    if ((int) $params[1] !== 1) {
+        $api->respond(404);
+    }
+    $api->respond(200);
+
+}, Api::TYPE_REGEXP);
+
+# Remove a player from a game
+$api->post('|^/game/(\d+)/remove-player$|', function($params) use ($api) {
+    $api->checkAccess();
+    if ((int) $params[1] !== 1) {
+        $api->respond(404);
+    }
+    $api->respond(200);
+
+}, Api::TYPE_REGEXP);
+
+# Remove a player from a game
+$api->get('|^/game/(\d+)$|', function($params) use ($api, $game) {
+    $api->checkAccess();
+    if ((int) $params[1] !== 1) {
+        $api->respond(404);
+    }
+    $api->respond(200, $game);
+
+}, Api::TYPE_REGEXP);
+
 
 
 # Run the API
