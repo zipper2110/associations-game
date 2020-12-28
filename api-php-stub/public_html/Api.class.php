@@ -56,12 +56,7 @@ class Api
      */
     public function get($route, $callback, $regexp = self::TYPE_SIMPLE)
     {
-        $this->routes[] = [
-            'method' => 'GET',
-            'route' => $route,
-            'callback' => $callback,
-            'regexp' => $regexp,
-        ];
+        $this->addRoute('GET', $route, $callback, $regexp);
     }
 
     /**
@@ -73,8 +68,57 @@ class Api
      */
     public function post($route, $callback, $regexp = self::TYPE_SIMPLE)
     {
+        $this->addRoute('POST', $route, $callback, $regexp);
+    }
+
+    /**
+     * Add a DELETE route
+     *
+     * @param string $route
+     * @param $callback
+     * @param int $regexp
+     */
+    public function delete($route, $callback, $regexp = self::TYPE_SIMPLE)
+    {
+        $this->addRoute('DELETE', $route, $callback, $regexp);
+    }
+
+    /**
+     * Add a PUT route
+     *
+     * @param string $route
+     * @param $callback
+     * @param int $regexp
+     */
+    public function put($route, $callback, $regexp = self::TYPE_SIMPLE)
+    {
+        $this->addRoute('PUT', $route, $callback, $regexp);
+    }
+
+    /**
+     * Add a PATCH route
+     *
+     * @param string $route
+     * @param $callback
+     * @param int $regexp
+     */
+    public function patch($route, $callback, $regexp = self::TYPE_SIMPLE)
+    {
+        $this->addRoute('PATCH', $route, $callback, $regexp);
+    }
+
+    /**
+     * Return a route array
+     *
+     * @param string $method
+     * @param string $route
+     * @param $callback
+     * @param int $regexp
+     */
+    private function addRoute($method, $route, $callback, $regexp = self::TYPE_SIMPLE)
+    {
         $this->routes[] = [
-            'method' => 'POST',
+            'method' => $method,
             'route' => $route,
             'callback' => $callback,
             'regexp' => $regexp,
