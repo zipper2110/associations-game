@@ -179,6 +179,8 @@ paths:
         '401':
           description: Credentials are wrong
           content: {}
+      security:
+        - jwtAuth: []
 
 
 components:
