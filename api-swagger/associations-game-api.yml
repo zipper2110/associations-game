@@ -177,8 +177,93 @@ paths:
                 $ref: '#/components/schemas/Game'
 
         '401':
-          description: Credentials are wrong
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+  ###################  Add a new player  ######################
+  '/game/{gameId}/add-player':
+    post:
+      tags:
+      - "game"
+      summary: Add a new player to a game
+      operationId: addPlayer
+      parameters:
+        - name: gameId
+          in: path
+          description: ID of the game to add a user to
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player_id:
+                  type: integer
+                  format: int64              
+            examples:
+              NewPlayer:
+                summary: New player
+                value:
+                  player_id: 2
+      responses:
+        '200':
+          description: Player has been successfully added
           content: {}
+        '400':
+          description: Some error happened while adding a player
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+  ###################  Remove player  ######################
+  '/game/{gameId}/remove-player':
+    post:
+      tags:
+      - "game"
+      summary: Remove a player from a game
+      operationId: removePlayer
+      parameters:
+        - name: gameId
+          in: path
+          description: ID of the game to remove a user from
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player_id:
+                  type: integer
+                  format: int64              
+            examples:
+              NewPlayer:
+                summary: New player
+                value:
+                  player_id: 2
+      responses:
+        '200':
+          description: Player has been successfully removes
+          content: {}
+        '400':
+          description: Some error happened while removing a player
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
       security:
         - jwtAuth: []
 
