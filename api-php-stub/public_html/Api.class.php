@@ -2,6 +2,9 @@
 
 class Api
 {
+    const TYPE_SIMPLE = 1;
+    const TYPE_REGEXP = 2;
+
     public $headers;
     public $optionsHeaders;
     public $apiPrefix;
@@ -48,9 +51,9 @@ class Api
      *
      * @param string $route
      * @param $callback
-     * @param bool $regexp
+     * @param int $regexp
      */
-    public function get($route, $callback, $regexp = false)
+    public function get($route, $callback, $regexp = self::TYPE_SIMPLE)
     {
         $this->routes[] = [
             'method' => 'GET',
@@ -65,9 +68,9 @@ class Api
      *
      * @param string $route
      * @param $callback
-     * @param bool $regexp
+     * @param int $regexp
      */
-    public function post($route, $callback, $regexp = false)
+    public function post($route, $callback, $regexp = self::TYPE_SIMPLE)
     {
         $this->routes[] = [
             'method' => 'POST',
@@ -141,12 +144,12 @@ class Api
             if ($this->method === $route['method'])
             {
                 # Proecss simple routes
-                if (!$route['regexp'] && $this->route === $route['route']) {
+                if ($route['regexp'] === self::TYPE_SIMPLE && $this->route === $route['route']) {
                     $route['callback']();
                 }
 
                 # Proecss regexp routes
-                if ($route['regexp'] && preg_match($route['route'], $this->route, $matches)) {
+                if ($route['regexp'] === self::TYPE_REGEXP && preg_match($route['route'], $this->route, $matches)) {
                     $route['callback']( $matches );
                 }
             }
@@ -160,8 +163,8 @@ class Api
     {
         return json_decode(file_get_contents('php://input'), true);
     }
-    
-    /** 
+
+    /**
      * Get header Authorization
      */
     private function getAuthorizationHeader()
@@ -184,7 +187,7 @@ class Api
         }
         return $headers;
     }
-    
+
     /**
      * Get access token from header
      */

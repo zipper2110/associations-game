@@ -70,7 +70,7 @@ $api->get('|^/user/(\d+)$|', function($params) use ($api, $user, $jwt_token) {
     unset($user['password']);
     $api->respond(200, $user);
 
-}, true);
+}, Api::TYPE_REGEXP);
 
 
 # Run the API
