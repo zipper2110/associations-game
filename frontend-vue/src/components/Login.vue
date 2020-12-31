@@ -10,7 +10,7 @@
               <v-text-field
                 :label="$t('login')"
                 v-model="form.login"
-                :rules="form.loginRules"
+                :rules="loginRules"
                 required
               ></v-text-field>
               <v-text-field
@@ -18,7 +18,7 @@
                 v-model="form.password"
                 min="8"
                 :type="'password'"
-                :rules="form.passwordRules"
+                :rules="passwordRules"
                 required
               ></v-text-field>
               <p v-if="showError" class="error--text">{{ $t('login_error') }}</p>
@@ -45,6 +45,17 @@ export default {
     },
     pageTitle () {
       return this.$i18n.messages[this.$i18n.locale].login
+    },
+    loginRules() {
+      return [
+        v => !!v || this.t.login_is_required,
+        v => /^[a-zA-Z]+$/.test(v) || this.t.login_must_be_valid
+      ];
+    },
+    passwordRules() {
+      return [
+        v => !!v || this.t.password_is_required
+      ];
     }
   },
   data () {
@@ -52,14 +63,7 @@ export default {
       form: {
         valid: false,
         login: '',
-        loginRules: [
-          v => !!v || this.t.login_is_required,
-          v => /^[a-zA-Z]+$/.test(v) || this.t.login_must_be_valid
-        ],
         password: '',
-        passwordRules: [
-          v => !!v || this.t.password_is_required
-        ]
       },
       showError: false
     };
