@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="text-center">
       <v-col lg="2" md="4" sm="10" offset-lg="5" offset-md="4" offset-sm="1">
-        <h1 class="mb-4 headline">{{ $t('login') }}</h1>
+        <h1 class="mb-4 mt-8 headline">{{ $t('login') }}</h1>
 
         <div class="login">
           <div>
@@ -127,8 +127,5 @@ export default {
     box-shadow:0 0 15px 4px rgba(0,0,0,0.06);
     padding:10px;
     border-radius:30px;
-  }
-  .error {
-    color: red;
   }
 </style>
