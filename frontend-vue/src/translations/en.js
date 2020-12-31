@@ -1,4 +1,15 @@
 export default {
   app_title: 'Associations Game',
   dark_mode: 'Dark mode',
+  lobby: 'Lobby',
+  login: 'Login',
+  logout: 'Logout',
+  login_btn: 'Submit',
+  email: 'E-mail',
+  password: 'Password',
+  login_error: 'E-mail or password is incorrect.',
+  login_is_required: 'Login is required',
+  login_must_be_valid: 'Login must be valid: only latin letters',
+  password_is_required: 'Password is required',
+  page_not_found: 'Page not found!',
 }

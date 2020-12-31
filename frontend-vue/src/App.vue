@@ -21,12 +21,12 @@
           <v-list-item>
             <v-list-item-content>
               <v-select
-                      v-model="locale"
-                      :items="langs"
-                      dense
-                      solo
-                      @click.stop
-                      hide-details
+                v-model="locale"
+                :items="langs"
+                dense
+                solo
+                @click.stop
+                hide-details
               ></v-select>
             </v-list-item-content>
           </v-list-item>
@@ -34,14 +34,32 @@
           <v-list-item>
             <v-list-item-content>
               <v-switch
-                      v-model="dark_mode"
-                      flat
-                      prepend-icon="mdi-brightness-6"
-                      :label="$t('dark_mode')"
-                      @click.stop
-                      class="mt-0 v-input--reverse"
-                      hide-details
+                v-model="dark_mode"
+                flat
+                prepend-icon="mdi-brightness-6"
+                :label="$t('dark_mode')"
+                @click.stop
+                class="mt-0 v-input--reverse"
+                hide-details
               ></v-switch>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item v-if="isLoggedIn">
+            <v-list-item-content>
+              <v-btn small :to="{ name: 'lobby' }" exact class="mr-2" >
+                <v-icon left>mdi-account</v-icon>
+                {{ $t('lobby') }}
+              </v-btn>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item v-if="isLoggedIn">
+            <v-list-item-content>
+              <v-btn small @click="logout" exact class="mr-2">
+                <v-icon left>mdi-logout</v-icon>
+                {{ $t('logout') }}
+              </v-btn>
             </v-list-item-content>
           </v-list-item>
 
@@ -51,19 +69,20 @@
     </v-app-bar>
 
     <v-main>
-      <HelloWorld/>
+      <transition name="fade" mode="out-in">
+        <router-view :key="$route.fullPath"></router-view>
+      </transition>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import auth from './services/auth'
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
   },
 
   data () {
@@ -97,10 +116,32 @@ export default {
         this.$store.commit('SET_LOCALE', value);
         this.$cookies.set('locale', value);
       }
+    },
+    isLoggedIn: function () {
+      return this.$store.getters.isAuthenticated
+    }
+  },
+
+  methods: {
+    async logout () {
+      auth.removeAuthData()
+      await this.$store.dispatch('LogOut')
+      await this.$router.push({ name: 'login' })
     }
   },
 
   mounted() {
+    // Update user info from cookies
+    if (auth.authCookiesExist()) {
+      this.$store.dispatch('updateUserInfoFromCookies', {
+        token: auth.getAuthToken(),
+        user: auth.getAuthName()
+      })
+    } else {
+      auth.removeAuthData()
+      this.$store.dispatch('LogOut');
+    }
+
     // Get the theme from cookies
     if (this.$cookies.isKey('dark')) {
       const darkMode = this.$cookies.get('dark') === 'true';
@@ -111,6 +152,7 @@ export default {
     // Get locale from cookies
     if (this.$cookies.isKey('locale')) {
       this.$root.$i18n.locale = this.$cookies.get('locale');
+      this.$store.commit('SET_LOCALE', this.$cookies.get('locale'));
     }
 
     // Check if it's a mobile device

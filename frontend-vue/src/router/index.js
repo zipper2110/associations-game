@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import Lobby from '../views/Lobby'
+import Login from '../components/Login'
+import PageNotFound from '../components/PageNotFound'
+import store from '../store/index';
+import auth from '../services/auth';
 
 Vue.use(VueRouter);
 
@@ -8,22 +12,52 @@ const routes = [
   {
     path: '/',
     name: 'lobby',
-    component: Home
+    component: Lobby,
+    meta: { requiresAuth: true }
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/login',
+    name: 'login',
+    component: Login,
+    meta: { guest: true }
+  },
+  {
+    path: '*',
+    component: PageNotFound
   }
 ];
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior () {
+    return { x: 0, y: 0 }
+  }
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (auth.authCookiesExist() || store.getters.isAuthenticated) {
+      next();
+      return;
+    }
+    next({ name: 'login' });
+  } else {
+    next();
+  }
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some((record) => record.meta.guest)) {
+    if (auth.authCookiesExist() || store.getters.isAuthenticated) {
+      next({ name: 'lobby' });
+      return;
+    }
+    next();
+  } else {
+    next();
+  }
 });
 
 export default router

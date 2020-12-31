@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+// noinspection NpmUsedModulesInstalled
+import auth from '@/modules/auth'
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -19,5 +22,6 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
+    auth
   }
 })
