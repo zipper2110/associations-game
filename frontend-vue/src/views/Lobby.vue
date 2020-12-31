@@ -3,7 +3,7 @@
     <v-row class="text-center">
       <v-col cols="12">
         <h1 class="display-2 font-weight-bold mb-3 mt-8">
-          Welcome to Associations Game!
+          {{ $t('welcome', { username }) }}
         </h1>
       </v-col>
     </v-row>
@@ -12,6 +12,7 @@
 
 <script>
 export default {
-  name: 'Lobby'
+  name: 'Lobby',
+  props: ['username']
 }
 </script>

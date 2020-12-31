@@ -12,4 +12,5 @@ export default {
   login_must_be_valid: 'Login must be valid: only latin letters',
   password_is_required: 'Password is required',
   page_not_found: 'Page not found!',
+  welcome: 'Welcome, %{username}!',
 }

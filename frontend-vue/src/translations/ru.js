@@ -12,4 +12,5 @@ export default {
   login_must_be_valid: 'Допустимы только латинские буквы',
   password_is_required: 'Введите пароль',
   page_not_found: 'Страница не найдена!',
+  welcome: 'Добро пожаловать, %{username}!',
 }

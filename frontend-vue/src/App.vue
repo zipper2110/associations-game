@@ -70,7 +70,10 @@
 
     <v-main>
       <transition name="fade" mode="out-in">
-        <router-view :key="$route.fullPath"></router-view>
+        <router-view
+            :key="$route.fullPath"
+            :username="username"
+        ></router-view>
       </transition>
     </v-main>
   </v-app>
@@ -97,6 +100,11 @@ export default {
   },
 
   computed: {
+    username: {
+      get() {
+        return this.$store.state.auth.user;
+      }
+    },
     dark_mode: {
       get() {
         return this.$store.state.dark_mode
