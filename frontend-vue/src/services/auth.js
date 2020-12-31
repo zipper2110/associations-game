@@ -15,8 +15,16 @@ export default {
   getAuthName () {
     return Vue.$cookies.get('user')
   },
+  getTokenTimeout () {
+    return Vue.$cookies.get('expire_ts')
+  },
+  getTokenExpiresIn () {
+    return Vue.$cookies.get('expires_in')
+  },
   removeAuthData () {
     Vue.$cookies.remove('token')
     Vue.$cookies.remove('user')
+    Vue.$cookies.remove('expire_ts')
+    Vue.$cookies.remove('expires_in')
   }
 }

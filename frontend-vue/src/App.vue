@@ -143,9 +143,18 @@ export default {
     if (auth.authCookiesExist()) {
       this.$store.dispatch('updateUserInfoFromCookies', {
         token: auth.getAuthToken(),
-        user: auth.getAuthName()
+        user: auth.getAuthName(),
+        expires_in: auth.getTokenExpiresIn(),
+        expire_ts: auth.getTokenTimeout(),
       })
-    } else {
+
+      // Set interval for updating token
+      // const check_once_in_seconds = 1;
+      // this.check_token_interval_id = setInterval(() => {
+      //   this.$store.dispatch('checkTokenExpiration');
+      // }, check_once_in_seconds * 1000)
+    }
+    else {
       auth.removeAuthData()
       this.$store.dispatch('LogOut');
     }

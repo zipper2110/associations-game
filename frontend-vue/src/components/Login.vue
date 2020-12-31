@@ -78,8 +78,14 @@ export default {
             password: this.form.password,
           })
           if (this.$store.state.auth.token && this.$store.state.auth.user) {
-            this.$cookies.set('token', this.$store.state.auth.token, 3600)
-            this.$cookies.set('user', this.$store.state.auth.user, 3600)
+            const token_timeout = this.$store.state.auth.expires_in;
+            this.$cookies.set('token', this.$store.state.auth.token, token_timeout)
+            this.$cookies.set('user', this.$store.state.auth.user, token_timeout)
+            this.$cookies.set('expires_in', token_timeout, token_timeout)
+            this.$cookies.set('expire_ts', (new Date().getTime() / 1000) + token_timeout)
+            console.log(new Date().getTime() / 1000)
+            console.log((new Date().getTime() / 1000) + token_timeout)
+
             await this.$router.push({ name: 'lobby' });
             this.showError = false
           } else {
