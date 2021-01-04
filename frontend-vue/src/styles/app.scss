@@ -1,3 +1,9 @@
 .v-app-bar .logo {
   user-select: none;
 }
+.v-app-bar .logo a {
+  color: #222;
+}
+.theme--dark .v-app-bar .logo a {
+  color: #fff;
+}
