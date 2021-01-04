@@ -5,7 +5,7 @@ import store from '../store'
 
 // Create HTTP object
 const HTTP = Axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? '/' : 'http://a-game-api',
+  baseURL: process.env.NODE_ENV === 'production' ? '/' : 'https://api.pangur.ru/v1',
   // withCredentials: true
 })
 
