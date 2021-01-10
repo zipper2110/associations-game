@@ -1,0 +1,437 @@
+openapi: 3.0.0
+
+info:
+  title: Associations Game API
+  description: The API description for the Associations Game. For testing auth you can use the following token "secret".
+  version: 0.0.1
+
+servers:
+  - url: https://api.pangur.ru/v1
+    description: Web test API server
+  - url: http://a-game-api
+    description: Local test API server
+
+tags:
+- name: "user"
+  description: "Operations about users"
+- name: "game"
+  description: "Operations about games"
+
+paths:
+  ########################################################
+  #                       USERS
+  ########################################################
+
+  #####################  Register  ####################### 
+  '/user/register':
+    post:
+      tags:
+      - "user"
+      summary: Registers a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserForm'
+            example:
+              username: NewUserName
+              password: fancyPassword
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtToken'
+        '400':
+          description: User already exists
+          content: {}
+
+  #####################  Login  #######################
+  '/user/login':
+    post:
+      tags:
+      - "user"
+      summary: Logs a user in
+      description: You can use "test" login and "test" password to test login.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserForm'
+            examples:
+              ExistingUser:
+                $ref: '#/components/examples/ExistingUser'
+              NotExistingUser:
+                $ref: '#/components/examples/NotExistingUser'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtToken'
+        '401':
+          description: Credentials are wrong
+          content: {}
+  
+  #####################  Logout #######################
+  '/user/logout':
+    post:
+      tags:
+      - "user"
+      summary: Logs a user out
+      operationId: logout
+      responses:
+        '200':
+          description: User successfuly logged out
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []          
+
+  #####################  Refresh JWT token #######################
+  '/user/refresh-token':
+    get:
+      tags:
+      - "user"
+      summary: Refreshes JWT token
+      operationId: refreshJwtToken
+      responses:
+        '200':
+          description: New JWT token successfuly obtained
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtToken'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+  #####################  Get User #######################
+  '/user/{userId}':
+    get:
+      tags:
+      - "user"
+      summary: Gets user info
+      description: There's user with ID 1 available in the test API.
+      operationId: getOneUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User successfuly obtained
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          description: Invalid ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content: {}
+      security:
+        - jwtAuth: []
+
+  ########################################################
+  #                       GAMES
+  ########################################################
+
+  ###################  Create game  ######################
+  '/game/create':
+    post:
+      tags:
+      - "game"
+      summary: Creates a new game
+      operationId: createGame
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameForm'
+            examples:
+              NewGameForm:
+                $ref: '#/components/examples/NewGameForm'
+      responses:
+        '200':
+          description: Game has been successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+  ###################  Get a game state  ######################
+  '/game/{gameId}':
+    get:
+      tags:
+      - "game"
+      summary: Get a game state
+      description: Test game with ID 1 is available in the test API.
+      operationId: getGame
+      parameters:
+        - name: gameId
+          in: path
+          description: ID of the game to get
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      responses:
+        '200':
+          description: Game state has been successfully obtained
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '400':
+          description: Some error happened while removing a player
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Game not found
+          content: {}
+      security:
+        - jwtAuth: []        
+
+  ###################  Add a new player  ######################
+  '/game/{gameId}/player':
+    post:
+      tags:
+      - "game"
+      summary: Add a new player to a game
+      description: Test game with ID 1 is available in the test API.
+      operationId: addPlayer
+      parameters:
+        - name: gameId
+          in: path
+          description: ID of the game to add a user to
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player_id:
+                  type: integer
+                  format: int64              
+            examples:
+              NewPlayer:
+                summary: New player
+                value:
+                  player_id: 2
+      responses:
+        '200':
+          description: Player has been successfully added
+          content: {}
+        '400':
+          description: Some error happened while adding a player
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+  ###################  Remove player  ######################
+    delete:
+      tags:
+      - "game"
+      summary: Remove a player from a game
+      description: Test game with ID 1 is available in the test API.
+      operationId: removePlayer
+      parameters:
+        - name: gameId
+          in: path
+          description: ID of the game to remove a user from
+          required: true
+          schema:
+            type: integer
+            format: int64
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player_id:
+                  type: integer
+                  format: int64              
+            examples:
+              NewPlayer:
+                summary: New player
+                value:
+                  player_id: 2
+      responses:
+        '200':
+          description: Player has been successfully removed
+          content: {}
+        '400':
+          description: Some error happened while removing a player
+          content: {}
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+      security:
+        - jwtAuth: []
+
+components:
+  
+  ###################  Examples  ######################
+  examples:
+
+    ExistingUser:
+      summary: Existing user
+      value:
+        username: test
+        password: test
+
+    NotExistingUser:
+      summary: Not existing user
+      value:
+        username: test222
+        password: test222
+
+    NewGameForm:
+      summary: Not existing user
+      value:
+        title: Some new game
+        users_number: 3
+        decks_number: 1
+        leader_id: 1
+
+  ###################  Schemas  ######################
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+      xml:
+        name: User
+
+    UserForm:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      xml:
+        name: UserForm
+
+    JwtToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: integer
+          format: int64
+      xml:
+        name: User
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        image:
+          type: string
+      xml:
+        name: Card
+
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        hash:
+          type: string
+        title:
+          type: string
+        players_number:
+          type: integer
+          format: int64
+        decks_number:
+          type: integer
+          format: int64
+        leader_id:
+          type: integer
+          format: int64
+        users:
+          type: array
+          xml:
+            name: user
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/User'
+        status:
+          type: string
+          enum:
+          - pending
+          - started
+          - finished          
+      xml:
+        name: Game
+
+    GameForm:
+      type: object
+      properties:
+        title:
+          type: string
+        players_number:
+          type: integer
+          format: int64
+        decks_number:
+          type: integer
+          format: int64
+      xml:
+        name: GameForm
+
+  ###################  Security  ######################
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  ###################  Responses  ######################
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
