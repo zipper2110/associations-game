@@ -1,0 +1,16 @@
+export default {
+  app_title: 'Ассоциации',
+  dark_mode: 'Тёмная тема',
+  lobby: 'Лобби',
+  login: 'Логин',
+  logout: 'Выйти',
+  login_btn: 'Войти',
+  email: 'E-mail',
+  password: 'Пароль',
+  login_error: 'E-mail или пароль не подходят.',
+  login_is_required: 'Укажите e-mail',
+  login_must_be_valid: 'Допустимы только латинские буквы',
+  password_is_required: 'Введите пароль',
+  page_not_found: 'Страница не найдена!',
+  welcome: 'Добро пожаловать, %{username}!',
+}
