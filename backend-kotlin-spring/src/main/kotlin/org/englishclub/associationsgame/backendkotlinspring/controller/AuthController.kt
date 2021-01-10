@@ -1,6 +1,7 @@
 package org.englishclub.associationsgame.backendkotlinspring.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.englishclub.associationsgame.backendkotlinspring.service.User
 import org.englishclub.associationsgame.backendkotlinspring.service.UserNotFoundException
 import org.englishclub.associationsgame.backendkotlinspring.service.UserService
@@ -8,7 +9,6 @@ import org.englishclub.associationsgame.backendkotlinspring.service.UsernameAlre
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.lang.RuntimeException
 import java.time.LocalDateTime
 import java.util.*
 
@@ -21,26 +21,22 @@ class AuthController(val userService: UserService, val objectMapper: ObjectMappe
     }
 
     @GetMapping("/me")
-    fun whoAmI(@RequestParam token: String): User {
-        val username = tokenToUser(token).username
-        return userService.getByUsername(username)
+    fun whoAmI(@RequestParam token: UserToken): User {
+        val userId = token.toUserDto().id
+        return userService.getById(userId)
     }
 
     @PostMapping("/logout")
     fun logout(@RequestBody logoutRequest: LogoutRequest) {
-        val user = tokenToUser(logoutRequest.token)
-        userService.destroy(user.id)
+        val userToken = logoutRequest.token.toUserDto()
+        userService.destroy(userToken.id)
     }
 
     private fun User.toAuthResponse(): AuthResponse {
-        val userJson = objectMapper.writeValueAsString(this)
+        val userDto = UserTokenDto(id, username)
+        val userJson = objectMapper.writeValueAsString(userDto)
         val userToken = Base64.getEncoder().encodeToString(userJson.encodeToByteArray())
         return AuthResponse(success = true, token = userToken)
-    }
-
-    private fun tokenToUser(token: String): User {
-        val userJsonString = Base64.getDecoder().decode(token).decodeToString()
-        return objectMapper.readValue(userJsonString, User::class.java)
     }
 
     @ExceptionHandler(UsernameAlreadyTakenException::class, UserNotFoundException::class)
@@ -49,11 +45,17 @@ class AuthController(val userService: UserService, val objectMapper: ObjectMappe
     }
 }
 
+fun UserToken.toUserDto(): UserTokenDto {
+    val objectMapper = ObjectMapper().registerKotlinModule()
+    val userTokenJsonString = Base64.getDecoder().decode(this).decodeToString()
+    return objectMapper.readValue(userTokenJsonString, UserTokenDto::class.java)
+}
+
 data class AuthRequest(val username: String)
 
-data class AuthResponse(val success: Boolean, val token: String)
+data class AuthResponse(val success: Boolean, val token: UserToken)
 
-data class LogoutRequest(val token: String)
+data class LogoutRequest(val token: UserToken)
 
 data class ErrorResponse(
     val error: String,

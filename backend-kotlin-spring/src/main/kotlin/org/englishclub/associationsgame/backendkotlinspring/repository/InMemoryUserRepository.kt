@@ -1,8 +1,6 @@
 package org.englishclub.associationsgame.backendkotlinspring.repository
 
-import org.englishclub.associationsgame.backendkotlinspring.service.User
-import org.englishclub.associationsgame.backendkotlinspring.service.UserNotFoundException
-import org.englishclub.associationsgame.backendkotlinspring.service.UsernameAlreadyTakenException
+import org.englishclub.associationsgame.backendkotlinspring.service.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import java.time.Instant
@@ -18,13 +16,13 @@ class InMemoryUserRepository(
     private val maxAllowedInactivityTimeSec: Long
 ) {
 
-    private val users = ConcurrentHashMap<String, User>()
+    private val users = mutableListOf<User>()
     private var lastUsersCleanupTime = Instant.now()
 
     fun userExists(username: String): Boolean {
         cleanupInactiveUsers()
 
-        return users.containsKey(username)
+        return users.any { it.username == username }
     }
 
     fun addUser(user: User) {
@@ -32,28 +30,49 @@ class InMemoryUserRepository(
 
         if (userExists(user.username)) throw UsernameAlreadyTakenException(user.username)
 
-        users[user.username] = user
+        users.add(user)
     }
 
-    fun getUser(username: String): User {
+    fun getUserByUsername(username: String): User {
         cleanupInactiveUsers()
 
-        return users[username] ?: throw UserNotFoundException(username)
+        return findUserByUsername(username) ?: throw UserNotFoundException(username)
     }
 
-    fun removeUser(userId: String) {
-        users.filterValues { it.id == userId }.forEach { users.remove(it.key) }
+    fun getUserById(userId: UserId): User {
+        cleanupInactiveUsers()
+
+        return findUserById(userId) ?: throw UserNotFoundException(userId = userId)
+    }
+
+    fun findUserByUsername(username: String): User? {
+        cleanupInactiveUsers()
+
+        return users.firstOrNull { it.username == username }
+    }
+
+    fun findUserById(userId: String): User? {
+        cleanupInactiveUsers()
+
+        return users.firstOrNull { it.id == userId }
+    }
+
+    fun updateStatus(userId: String, status: UserStatus) {
+        val user = getUserById(userId)
+        users -= user
+        users += user.copy(status = status, lastActivityTime = Instant.now())
+    }
+
+    fun removeUserById(userId: String) {
+        users.filter { it.id == userId }.forEach { users.remove(it) }
     }
 
     private fun cleanupInactiveUsers() {
         val now = Instant.now()
         if (lastUsersCleanupTime.until(now, SECONDS) < runUserCleanupEverySecs) return
 
-        val inactiveUsers = users.values.filter {
-            it.lastActivityTime.until(now, SECONDS) > maxAllowedInactivityTimeSec
-        }
-
-        inactiveUsers.map { it.username }.forEach { users.remove(it) }
+        users.filter { it.lastActivityTime.until(now, SECONDS) > maxAllowedInactivityTimeSec }
+            .forEach { users -= it }
 
         lastUsersCleanupTime = Instant.now()
     }

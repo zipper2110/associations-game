@@ -15,11 +15,15 @@ class UserService(private val userRepo: InMemoryUserRepository) {
     }
 
     fun destroy(userId: String) {
-        userRepo.removeUser(userId)
+        userRepo.removeUserById(userId)
     }
 
     fun getByUsername(username: String): User {
-        return userRepo.getUser(username)
+        return userRepo.getUserByUsername(username)
+    }
+
+    fun getById(userId: UserId): User {
+        return userRepo.getUserById(userId)
     }
 }
 

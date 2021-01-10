@@ -17,7 +17,8 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
 
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
         config.enableSimpleBroker("/topic")
-        config.setApplicationDestinationPrefixes("/app")
+        config.setApplicationDestinationPrefixes("/game")
+        config.setUserDestinationPrefix("/user")
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
