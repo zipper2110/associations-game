@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>Hello WebSocket</title>
+    <title>Тестовый UI</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/main.css" rel="stylesheet">
     <script src="/webjars/jquery/jquery.min.js"></script>
@@ -10,43 +10,98 @@
     <script src="/app.js"></script>
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
 <div id="main-content" class="container">
     <div class="row">
-        <div class="col-md-6">
-            <form class="form-inline">
-                <div class="form-group">
-                    <label for="connect">WebSocket connection:</label>
-                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
-                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect</button>
+        <div class="col-md-8 control-panel">
+            <div class="row">
+                <div class="col-md-12 auth">
+                    <h3>Авторизация пользователя</h3>
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label for="username">Имя</label>
+                            <input type="text" id="username" value="Jack">
+                            <button id="login" class="btn btn-primary" type="submit">Войти</button>
+                            <button id="logout" class="btn btn-default" type="submit">Выйти</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
+            <div class="row">
+                <h4>статус авторизации</h4>
+                <span id="auth-status">пока непонятно</span>
+            </div>
+            <div class="row">
+                <button id="get-user">получить пользователя</button>
+                <div>
+                    <textarea id="user-info"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <h3>WebSocket подключение</h3>
+                <div class="col-md-12">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <button id="connect" class="btn btn-default" type="submit">Подключиться</button>
+                            <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Отключиться</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>статус websocket</h4>
+                    <span class="websocket-status">пока никакой</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <h3>Отправка произвольного сообщения</h3>
+            </div>
+            <div class="row">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="path">Адрес:</label>
+                        <span>/game/</span>
+                        <input type="text" id="path" value="join-lobby">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="token">Токен:</label>
+                        <input type="text" id="token" value="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="content">Сообщение (без токена):</label>
+                        <textarea id="content">{
+
+                    }</textarea>
+                    </div>
+                </div>
+            </div>
+            <button id="send-command" class="btn btn-primary">Отправить</button>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            <label for="path">Path:</label>
-            <input type="text" id="path" value="/game/join-lobby">
-        </div>
-        <div class="col-md-8">
-            <label for="content">Content:</label>
-            <textarea id="content"></textarea>
-        </div>
-    </div>
-    <button id="send-command" class="btn btn-primary">Send message</button>
-    <div class="row">
-        <div class="col-md-12">
-            <table id="conversation" class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Greetings</th>
-                </tr>
-                </thead>
-                <tbody id="greetings">
-                </tbody>
-            </table>
+        <div class="col-md-4 log">
+            <div class="row">
+                <h3>Лог сообщений</h3>
+            </div>
+            <div class="row websocket-log">
+
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="conversation" class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Общение</th>
+                        </tr>
+                        </thead>
+                        <tbody id="greetings">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
